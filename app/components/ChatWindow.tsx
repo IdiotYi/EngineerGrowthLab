@@ -56,36 +56,37 @@ export default function ChatWindow({ chatId, model }: ChatWindowProps) {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/chat', {
+      console.log('Sending request to:', `${process.env.NEXT_PUBLIC_API_URL || 'http://20.78.58.150:8000'}/chat`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://20.78.58.150:8000'}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           message: input,
           model: model
-        }),
-        credentials: 'include',
+        })
       });
 
+      console.log('Response status:', response.status);
+      const data = await response.json();
+      console.log('Response data:', data);
+
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
-        throw new Error(errorData.detail || 'Network response was not ok');
+        throw new Error(data.detail || 'API request failed');
       }
 
-      const data = await response.json();
-      
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: data.response,
+        content: data.response || 'No response from server',
         role: 'assistant',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
 
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('Error details:', error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: error instanceof Error ? error.message : '发生了未知错误。',
