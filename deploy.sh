@@ -54,7 +54,7 @@ sudo mkdir -p /etc/nginx/sites-enabled
 sudo tee /etc/nginx/sites-available/engineerlab << EOF
 server {
     listen 80;
-    server_name your_domain.com;  # 替换为你的域名
+    server_name _;  # 监听所有 IP 地址
 
     location / {
         root /opt/engineerlab/.next;
