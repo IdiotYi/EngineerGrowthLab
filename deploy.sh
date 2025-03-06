@@ -4,7 +4,11 @@
 sudo apt update && sudo apt upgrade -y
 
 # 安装必要的软件包
-sudo apt install -y curl git python3 python3-pip python3-venv nodejs npm nginx
+sudo apt install -y curl git python3 python3-pip python3-venv nginx
+
+# 安装 Node.js 18.x
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install -y nodejs
 
 # 创建应用目录
 sudo mkdir -p /opt/engineerlab
@@ -42,6 +46,10 @@ cd ../
 npm install
 npm run build
 
+# 创建 Nginx 配置目录
+sudo mkdir -p /etc/nginx/sites-available
+sudo mkdir -p /etc/nginx/sites-enabled
+
 # 配置 Nginx
 sudo tee /etc/nginx/sites-available/engineerlab << EOF
 server {
@@ -65,7 +73,7 @@ server {
 EOF
 
 # 启用 Nginx 配置
-sudo ln -s /etc/nginx/sites-available/engineerlab /etc/nginx/sites-enabled/
+sudo ln -sf /etc/nginx/sites-available/engineerlab /etc/nginx/sites-enabled/
 sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t
 sudo systemctl restart nginx
